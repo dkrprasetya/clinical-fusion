@@ -37,7 +37,7 @@ def parse_args():
     parser.add_argument('--model', type=str, default='lstm') # cnn or lstm
     parser.add_argument('--inputs', type=int, default=6) # 3: T + S, 4: U, 7: U + T + S
     parser.add_argument('--phase', type=str, default='train')
-    parser.add_argument('--epochs', type=int, default=1)
+    parser.add_argument('--epochs', type=int, default=5)
     parser.add_argument('--split_num', type=int, default=4000)
     parser.add_argument('--batch_size', type=int, default=100)
     parser.add_argument('--workers', type=int, default=10)

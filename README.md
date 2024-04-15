@@ -1,5 +1,14 @@
 ## Combining structured and unstructured data for predictive models: a deep learning approach
 
+### Introduction
+
+This is a forked repository of paper *Combining structured and unstructured data for predictive models: a deep learning approach* for UIUC CS598 Deep Learning for Healthcare project purposes.
+
+Please refer to the dedicated notebook https://github.com/dkrprasetya/clinical-fusion/blob/dev/DL4H_Team_105_project_draft.ipynb for the course assignment submission.
+
+
+### Original Summary
+
 This repository contains source code for paper *Combining structured and unstructured data for predictive models: a deep learning approach*. In this paper, we proposed 2 frameworks, namely Fusion-CNN and Fusion-LSTM, to combine sequential clinical notes and temporal signals for patient outcome prediction. Experiments of in-hospital mortality prediction, long length of stay prediction, and 30-day readmission prediction on MIMIC-III datasets empirically shows the effectiveness of proposed models. Combining structured and unstructured data leads to a significant performance improvement.
 
 ### Framework
