@@ -12,8 +12,12 @@ if __name__ == '__main__':
         'dob', 'dod', 'admittime', 'dischtime'])
     print('Total admissions:', len(df_adm))
     df_adm = df_adm[df_adm['has_chartevents_data'] == 1]
-    df_adm['age'] = df_adm['admittime'].subtract(
-        df_adm['dob']).dt.days / 365.242
+
+    # Updated: add min_dob_year as some dob are too early
+    min_dob_year = pd.to_datetime('2100-01-01')
+    df_adm['dob'] = df_adm['dob'].apply(lambda x: x if x > min_dob_year else min_dob_year)
+
+    df_adm['age'] = df_adm['admittime'].subtract(df_adm['dob']).dt.days / 365.242
     df_adm['los'] = (df_adm['dischtime'] - df_adm['admittime']) / np.timedelta64(1, 'D')
     df_adm = df_adm[df_adm['age'] >= 18]  # keep adults
     df_adm['age'] = df_adm['age'].apply(bin_age)

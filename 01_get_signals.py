@@ -3,8 +3,7 @@ import numpy as np
 
 
 def get_signals(start_hr, end_hr):
-    df_adm = pd.read_csv('./data/mimic/adm_details.csv',
-                         parse_dates=['admittime'])
+    df_adm = pd.read_csv('./data/mimic/adm_details.csv', parse_dates=['admittime'])
     adm_ids = df_adm.hadm_id.tolist()
     for signal in ['vital', 'lab']:
         df = pd.read_csv(
@@ -13,15 +12,19 @@ def get_signals(start_hr, end_hr):
         df = df[df.hadm_id.isin(adm_ids)]
         df['hr'] = (df.charttime - df.admittime) / np.timedelta64(1, 'h')
         df = df[(df.hr <= end_hr) & (df.hr >= start_hr)]
+        # Updated: from H to h
         df = df.set_index('hadm_id').groupby('hadm_id').resample(
-            'H', on='charttime').mean().reset_index()
+            'h', on='charttime').mean(numeric_only=None).reset_index()
         df.to_csv('./data/mimic/{}.csv'.format(signal), index=None)
+    # Update: add missing admittime
     df = pd.read_csv('./data/mimic/vital.csv', parse_dates=['charttime'])[
         ['hadm_id', 'charttime', 'heartrate', 'sysbp', 'diasbp', 'meanbp', 'resprate', 'tempc', 'spo2']]
     df_lab = pd.read_csv('./data/mimic/lab.csv',
                          parse_dates=['charttime'])
     df = df.merge(df_lab, on=['hadm_id', 'charttime'], how='outer')
     df = df.merge(df_adm[['hadm_id', 'admittime']], on='hadm_id')
+    df['admittime'] = df['admittime_y'].fillna(df['admittime_x'])
+    df = df.drop(['admittime_x', 'admittime_y'], axis=1)
     df['charttime'] = ((df.charttime - df.admittime) / np.timedelta64(1, 'h'))
     df['charttime'] = df['charttime'].apply(np.ceil) + 1
     df = df[(df.charttime <= end_hr) & (df.charttime >= start_hr)]

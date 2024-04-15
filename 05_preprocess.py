@@ -1,14 +1,25 @@
 import numpy as np
-from tqdm import tqdm
-
 import os
 import time
 import json
 import argparse
-from glob import glob
-
+import re
+import pandas as pd
 import utils
 
+from datetime import datetime
+from glob import glob
+from tqdm import tqdm
+
+# Update to check if feature is timestamp, and then convert timestamp to numberic value
+def is_timestamp(value):
+    timestamp_pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+    return re.match(timestamp_pattern, value) is not None
+
+def timestamp_to_numeric(timestamp_str):
+    timestamp = pd.to_datetime(timestamp_str)
+    # Convert the datetime to epoch time
+    return timestamp.timestamp()
 
 def parse_args():
     parser = argparse.ArgumentParser(description='preprocessing help')
@@ -142,7 +153,12 @@ def generate_feature_dict(args):
                         feat = feat_list[iv]
                         if feat not in feature_value_dict:
                             feature_value_dict[feat] = []
-                        feature_value_dict[feat].append(float(v))
+                        # Update here
+                        if is_timestamp(v):
+                            numeric_value = timestamp_to_numeric(v)
+                        else:
+                            numeric_value = float(v)
+                        feature_value_dict[feat].append(numeric_value)
     feature_mm_dict = dict()
     feature_ms_dict = dict()
 
