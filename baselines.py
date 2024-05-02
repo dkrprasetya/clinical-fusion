@@ -65,7 +65,7 @@ def train_test_base(X_train, X_test, y_train, y_test, name):
     else:
         metric = cal_metric(y_test, probs[:, 1])
         print(metric)
-    
+
 
 if __name__ == '__main__':
     args = parse_args()
@@ -119,9 +119,20 @@ if __name__ == '__main__':
 
         X_train_demo = df_demo[df_demo['hadm_id'].isin(str_train_ids)][['demos']].to_numpy()
         X_test_demo = df_demo[df_demo['hadm_id'].isin(str_test_ids)][['demos']].to_numpy()
-        X_train.append(X_train_demo)
-        X_test.append(X_test_demo)
-    
+
+        # ValueError: setting an array element with a sequence fix when selecting demographics
+
+        X_train_demo_bis, X_test_demo_bis = [], []
+
+        for item in X_train_demo:
+            X_train_demo_bis.append(np.array(item[0]))
+
+        for item in X_test_demo:
+            X_test_demo_bis.append(np.array(item[0]))
+
+        X_train.append(X_train_demo_bis)
+        X_test.append(X_test_demo_bis)
+
     print('Done.')
     df_cols = df.columns[1:]
 
