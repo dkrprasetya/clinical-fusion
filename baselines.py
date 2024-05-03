@@ -141,7 +141,7 @@ if __name__ == '__main__':
     y_train = df[df['hadm_id'].isin(train_ids)][df_cols].to_numpy()
     y_test = df[df['hadm_id'].isin(test_ids)][df_cols].to_numpy()
 
-    print(X_train)
+    #print(X_train)
 
     if model == 'all':
         train_test_base(X_train, X_test, y_train, y_test, 'lr')
