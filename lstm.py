@@ -185,7 +185,7 @@ class LSTM(nn.Module):
         out = self.output(torch.cat((output, d), 1))
 
         # unstructure
-        if content is not None:
+        if self.args.use_unstructure and content is not None:
             # print(content.size())   # [64, 1000]
             content, _ = self.lstm1(content)
             content = self.vocab_mapping(content)
