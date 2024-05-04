@@ -37,7 +37,7 @@ if __name__ == '__main__':
     args = parse_args()
     print('Reading data...')
     early_categories = ['Nursing', 'Nursing/other', 'Physician ', 'Radiology']
-    df_notes = pd.read_csv('./data/mimic/NOTEEVENTS.csv', parse_dates=['CHARTTIME'])
+    df_notes = pd.read_csv('./data/mimic/real/NOTEEVENTS.csv', parse_dates=['CHARTTIME'])
     df_notes.columns = map(str.lower, df_notes.columns)
     df_notes = df_notes[df_notes['iserror'].isnull()]
     df_notes = df_notes[~df_notes['hadm_id'].isnull()]
@@ -45,6 +45,7 @@ if __name__ == '__main__':
     
     df_adm = pd.read_csv('./data/mimic/adm_details.csv', parse_dates=['admittime'])
     df_notes = df_notes.merge(df_adm, on='hadm_id', how='left')
+    print("df_notes:", df_notes)
 
     if args.firstday:
         print('Extracting first day notes...')

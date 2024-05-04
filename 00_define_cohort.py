@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     print('Collecting labels...')
 
-    df_icd = pd.read_csv('./data/mimic/DIAGNOSES_ICD.csv')[['HADM_ID', 'ICD9_CODE']].dropna()
+    df_icd = pd.read_csv('./data/mimic/DIAGNOSES_ICD.csv')[['hadm_id', 'icd9_code']].dropna()
     df_icd.columns = map(str.lower, df_icd.columns)
     df_icd['icd9_code'] = df_icd['icd9_code'].apply(convert_icd_group)
     df_icd = df_icd.dropna().drop_duplicates().sort_values(['hadm_id', 'icd9_code'])
