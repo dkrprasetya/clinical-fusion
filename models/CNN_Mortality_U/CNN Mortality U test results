@@ -1,0 +1,22 @@
+/Users/luis/opt/anaconda3/envs/CS598FinalProject/bin/python /Users/luis/PycharmProjects/clinical-fusion/main.py 
+Use the last 24 collections data
+Use the last 24 collections data
+Use the last 24 collections data
+valid   mortality   4   cnn
+100%|██████████| 35/35 [01:54<00:00,  3.27s/it]
+1 (0.3398516520566419, 0.8209960741898009, 0.3704401300910704)
+Avg [0.3398516520566419, 0.8209960741898009, 0.3704401300910704]
+
+valid Epoch 26 (lr 0.000100)
+loss: 0.5202 	
+  0%|          | 0/70 [00:00<?, ?it/s]				 best epoch: 26     best AUC: 0.8210 	
+test   mortality   4   cnn
+100%|██████████| 70/70 [01:52<00:00,  1.60s/it]
+1 (0.35634743875278396, 0.8310171166529576, 0.3635469585098057)
+Avg [0.35634743875278396, 0.8310171166529576, 0.3635469585098057]
+
+test Epoch 0 (lr 0.000100)
+loss: 0.4996 	
+				 best epoch: 26     best AUC: 0.8210 	
+
+Process finished with exit code 0
