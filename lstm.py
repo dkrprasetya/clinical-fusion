@@ -148,7 +148,7 @@ class LSTM(nn.Module):
 
     def forward(self, x, t, dd, content=None):
 
-        if self.args_use_ve == 0:
+        if self.args.use_ve == 0:
             assert content is not None
 
             content, _ = self.lstm1(content)
