@@ -23,8 +23,8 @@ warnings.filterwarnings('ignore')
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--task', type=str, default='mortality') # mortality, readmit, or llos
-    parser.add_argument('--model', type=str, default='lr') # all, lr, or rf
-    parser.add_argument('--inputs', type=int, default=6) # 3: T + S, 4: U, 7: U + T + S
+    parser.add_argument('--model', type=str, default='all') # all, lr, or rf
+    parser.add_argument('--inputs', type=int, default=7) # 3: T + S, 4: U, 7: U + T + S
     args = parser.parse_args()
     return args
 
