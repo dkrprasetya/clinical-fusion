@@ -1,0 +1,17 @@
+Use the last 24 collections data
+Use the last 24 collections data
+Use the last 24 collections data
+valid
+1 (0.7088142707240294, 0.7723527291388311, 0.7738694231226229)
+Avg [0.7088142707240294, 0.7723527291388311, 0.7738694231226229]
+
+valid Epoch 26 (lr 0.000100)
+loss: 0.5792 	
+				 best epoch: 26     best AUC: 0.7724 	
+test
+1 (0.6823625476320088, 0.7516356673960612, 0.7466384059787105)
+Avg [0.6823625476320088, 0.7516356673960612, 0.7466384059787105]
+
+test Epoch 0 (lr 0.000100)
+loss: 0.5952 	
+				 best epoch: 26     best AUC: 0.7724 	

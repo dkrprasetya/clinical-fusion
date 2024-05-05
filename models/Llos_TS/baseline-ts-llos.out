@@ -1,0 +1,10 @@
+Running task llos using inputs 3...
+Loading temporal data...
+Loading demographics...
+Done.
+Start training Logistic Regression:
+Running time: 2.5613365173339844
+(0.6622333056248269, 0.7267357912011977, 0.7219246783694334)
+Start training Random Forest:
+Running time: 433.6338903903961
+(0.6825883922615077, 0.7406303624899229, 0.7358311704361145)
