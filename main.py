@@ -27,7 +27,7 @@ import sklearn
 
 from utils import cal_metric
 
-sys.path.append('./tools')
+sys.path.insert(0, './tools')
 import py_op
 import argparse
 
@@ -35,15 +35,15 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--task', type=str, default='mortality') # mortality, readmit, or llos
     parser.add_argument('--model', type=str, default='lstm') # cnn or lstm
-    parser.add_argument('--inputs', type=int, default=6) # 3: T + S, 4: U, 7: U + T + S
+    parser.add_argument('--inputs', type=int, default=4) # 3: T + S, 4: U, 7: U + T + S
     parser.add_argument('--phase', type=str, default='train')
-    parser.add_argument('--epochs', type=int, default=5)
+    parser.add_argument('--epochs', type=int, default=25)
     parser.add_argument('--split_num', type=int, default=4000)
     parser.add_argument('--batch_size', type=int, default=100)
-    parser.add_argument('--workers', type=int, default=10)
+    parser.add_argument('--workers', type=int, default=4)
     parser.add_argument('--unstructure_size', type=int, default=200)
     parser.add_argument('--num_layers', type=int, default=2)
-    parser.add_argument('--lr', type=float, default=0.01)
+    parser.add_argument('--lr', type=float, default=0.0001)
     parser.add_argument('--resume', type=bool, default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument('--data-dir', type=str, default='data/processed', help='data dir')
     args = parser.parse_args()
@@ -61,9 +61,10 @@ args.use_ve = 1
 args.n_visit = 24
 args.use_unstructure = 1
 args.value_embedding = 'use_order'
-# args.value_embedding = 'no'
+#args.value_embedding = 'no'
 
 args.task = 'mortality'
+args.inputs = 4 # 3: T + S, 4: U, 7: U + T + S
 # args.files_dir = args.files_dir
 # args.data_dir = args.data_dir
 args.files_dir = os.path.join(args.data_dir, 'files')
@@ -109,7 +110,7 @@ def index_value(data):
     return [index, value]
 
 def train_eval(data_loader, net, loss, epoch, optimizer, best_metric, phase='train'):
-    print(phase)
+    print(phase," ", args.task, " ",args.inputs, " ", args.model)
     lr = get_lr(epoch)
     if phase == 'train':
         net.train()

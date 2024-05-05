@@ -206,57 +206,63 @@ class CNN(nn.Module):
 
     def forward(self, x, t, dd, content=None):
 
-        if content is not None:
+        #if content is not None:
+        if self.args.inputs == 4:
+            #print("One input")
             # content = self.vocab_embedding(content).transpose(1,2)
             content = self.vocab_layer(content.transpose(1,2))
             content = self.pooling(content)                                       # (64*30, 200, 1)
             content = content.view((content.size(0), -1))
             return self.one_output(content)
 
-        # value embedding
-        x = self.value_order_embedding(x)
-        x = self.visit_pooling(x)
+        if self.args.inputs != 4:
+            #print("Two inputs")
+            # value embedding
+            x = self.value_order_embedding(x)
+            x = self.visit_pooling(x)
 
 
-        # time embedding
-        # t = self.value_embedding(t)
-        # x = self.tv_mapping(torch.cat((x, t), 2))
+            # time embedding
+            # t = self.value_embedding(t)
+            # x = self.tv_mapping(torch.cat((x, t), 2))
 
-        # cnn
-        x = torch.transpose(x, 1, 2,).contiguous()
-        out = self.bn1(x)
-        out = self.relu(out)
-        out = self.layer1(out)
-        # out = self.layer2(out)
-        # out = self.layer3(out)
+            # cnn
+            x = torch.transpose(x, 1, 2,).contiguous()
+            out = self.bn1(x)
+            out = self.relu(out)
+            out = self.layer1(out)
+            # out = self.layer2(out)
+            # out = self.layer3(out)
 
-        output = self.pooling(out)                                       # (64*30, 200, 1)
-        output = output.view((output.size(0), -1))
+            output = self.pooling(out)                                       # (64*30, 200, 1)
+            output = output.view((output.size(0), -1))
 
 
-        if len(dd.size()) > 1:
-            # demo embedding
-            dsize = list(dd.size()) + [-1]
-            d = self.dd_embedding(dd.view(-1)).view(dsize)
-            d = self.dd_mapping(d)
-            d = torch.transpose(d, 1,2).contiguous()                  # (64*30, 200, 100)
-            d = self.pooling(d)
-            d = d.view((d.size(0), -1))
-            output = torch.cat((output, d), 1)
-            out = self.cat_output(output)
-        # else:
-        #     out = self.output(output)
+            if len(dd.size()) > 1:
+                # demo embedding
+                dsize = list(dd.size()) + [-1]
+                d = self.dd_embedding(dd.view(-1)).view(dsize)
+                d = self.dd_mapping(d)
+                d = torch.transpose(d, 1,2).contiguous()                  # (64*30, 200, 100)
+                d = self.pooling(d)
+                d = d.view((d.size(0), -1))
+                output = torch.cat((output, d), 1)
+                out = self.cat_output(output)
+            # else:
+            #     out = self.output(output)
 
-        if content is not None:
-            # content = self.vocab_embedding(content)
-            content = self.vocab_layer(content.transpose(1,2))
-            content = self.pooling(content)                                       # (64*30, 200, 1)
-            content = content.view((content.size(0), -1))
-            # content = self.one_output(content) + 0.3 * out
-            # out = content + out
-            # out = content 
-            output = torch.cat((output, content), 1)
-            out = self.vocab_output(output)
+            #if content is not None:
+            if self.args.inputs == 7:
+                #print("Three inputs")
+                # content = self.vocab_embedding(content)
+                content = self.vocab_layer(content.transpose(1,2))
+                content = self.pooling(content)                                       # (64*30, 200, 1)
+                content = content.view((content.size(0), -1))
+                # content = self.one_output(content) + 0.3 * out
+                # out = content + out
+                # out = content
+                output = torch.cat((output, content), 1)
+                out = self.vocab_output(output)
 
         return out
 
