@@ -9,7 +9,6 @@ import numpy as np
 
 import sys
 
-sys.path.append('../tools')
 import parse, py_op
 
 output_size = 1
@@ -149,14 +148,9 @@ class LSTM(nn.Module):
 
     def forward(self, x, t, dd, content=None):
 
-        # print("x: ", len(x))
-        # print("t: ", len(t))
-        # print("dd: ", len(dd))
-        # print("content: ", len(content))
+        if self.args_use_ve == 0:
+            assert content is not None
 
-        if self.args.inputs == 4:
-            #if 0 and content is not None:
-            #print("one input")
             content, _ = self.lstm1(content)
             content = self.vocab_mapping(content)
             content = torch.transpose(content, 1, 2).contiguous()
@@ -164,46 +158,42 @@ class LSTM(nn.Module):
             content = content.view((content.size(0), -1))
             return self.one_output(content)
 
-        if self.args.inputs != 4:
-            # value embedding
-            #print("two inputs")
-            x = self.value_order_embedding(x)
-            x = self.visit_pooling(x)
+        # value embedding
+        x = self.value_order_embedding(x)
+        x = self.visit_pooling(x)
 
-            # demo embedding
-            dsize = list(dd.size()) + [-1]
-            d = self.dd_embedding(dd.view(-1)).view(dsize)
-            d = self.dd_mapping(d)
-            d = torch.transpose(d, 1, 2).contiguous()  # (64*30, 200, 100)
-            d = self.pooling(d)
-            d = d.view((d.size(0), -1))
+        # demo embedding
+        dsize = list(dd.size()) + [-1]
+        d = self.dd_embedding(dd.view(-1)).view(dsize)
+        d = self.dd_mapping(d)
+        d = torch.transpose(d, 1,2).contiguous()                  # (64*30, 200, 100)
+        d = self.pooling(d)
+        d = d.view((d.size(0), -1))
 
-            # x = torch.cat((x, d), 2)
-            # x = self.dx_mapping(x)
+        # x = torch.cat((x, d), 2)
+        # x = self.dx_mapping(x)
 
-            # time embedding
-            # t = self.value_embedding(t)
-            # x = self.tv_mapping(torch.cat((x, t), 2))
+        # time embedding
+        # t = self.value_embedding(t)
+        # x = self.tv_mapping(torch.cat((x, t), 2))
 
-            # lstm
-            lstm_out, _ = self.lstm2(x)  # (64, 30, 1024)
-            output = self.output_mapping(lstm_out)
-            output = torch.transpose(output, 1, 2).contiguous()  # (64*30, 200, 100)
-            # print('ouput.size', output.size())
-            output = self.pooling(output)  # (64*30, 200, 1)
-            output = output.view((output.size(0), -1))
-            out = self.output(torch.cat((output, d), 1))
+        # lstm
+        lstm_out, _ = self.lstm2( x )            # (64, 30, 1024)
+        output = self.output_mapping(lstm_out)
+        output = torch.transpose(output, 1,2).contiguous()                  # (64*30, 200, 100)
+        # print('ouput.size', output.size())
+        output = self.pooling(output)                                       # (64*30, 200, 1)
+        output = output.view((output.size(0), -1))
+        out = self.output(torch.cat((output, d), 1))
 
-            # unstructure
-            #if content is not None:
-            if self.args.inputs == 7:
-                #print("three inputs")
-                # print(content.size())   # [64, 1000]
-                content, _ = self.lstm1(content)
-                content = self.vocab_mapping(content)
-                content = torch.transpose(content, 1, 2).contiguous()
-                content = self.pooling(content)
-                content = content.view((content.size(0), -1))
-                out = self.cat_output(torch.cat((output, content, d), 1))
+        # unstructure
+        if self.args.use_unstructure and content is not None:
+            # print(content.size())   # [64, 1000]
+            content, _ = self.lstm1(content)
+            content = self.vocab_mapping(content)
+            content = torch.transpose(content, 1, 2).contiguous()
+            content = self.pooling(content)
+            content = content.view((content.size(0), -1))
+            out = self.cat_output(torch.cat((output, content, d), 1))
 
         return out

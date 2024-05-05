@@ -1,10 +1,7 @@
-import sys
-
 import os
 import sys
 import time
 import numpy as np
-from sklearn import metrics
 import random
 import json
 from glob import glob
@@ -21,35 +18,17 @@ from torch.utils.data import DataLoader
 import data_loader
 import lstm, cnn
 import myloss
-import function
+from function import *
 
 import sklearn
 
 from utils import cal_metric
 
-sys.path.insert(0, './tools')
-import py_op
-import argparse
-
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--task', type=str, default='mortality') # mortality, readmit, or llos
-    parser.add_argument('--model', type=str, default='lstm') # cnn or lstm
-    parser.add_argument('--inputs', type=int, default=4) # 3: T + S, 4: U, 7: U + T + S
-    parser.add_argument('--phase', type=str, default='train')
-    parser.add_argument('--epochs', type=int, default=25)
-    parser.add_argument('--split_num', type=int, default=4000)
-    parser.add_argument('--batch_size', type=int, default=100)
-    parser.add_argument('--workers', type=int, default=4)
-    parser.add_argument('--unstructure_size', type=int, default=200)
-    parser.add_argument('--num_layers', type=int, default=2)
-    parser.add_argument('--lr', type=float, default=0.0001)
-    parser.add_argument('--resume', type=bool, default=False, action=argparse.BooleanOptionalAction)
-    parser.add_argument('--data-dir', type=str, default='data/processed', help='data dir')
-    args = parser.parse_args()
-    return args
+from py_op import *
+from parse import *
 
 args = parse_args()
+
 args.embed_size = 200
 args.hidden_size = args.rnn_size = args.embed_size 
 if torch.cuda.is_available():
@@ -57,16 +36,17 @@ if torch.cuda.is_available():
 else:
     args.gpu = 0
 
-args.use_ve = 1
 args.n_visit = 24
-args.use_unstructure = 1
-args.value_embedding = 'use_order'
-#args.value_embedding = 'no'
 
-args.task = 'mortality'
-args.inputs = 4 # 3: T + S, 4: U, 7: U + T + S
-# args.files_dir = args.files_dir
-# args.data_dir = args.data_dir
+args.use_unstructure = 1 if (args.inputs & 4) > 0 else 0
+
+# Note that T and S inputs are in one set due to limitations on the original implementation.
+# If any of T or S is enabled, then both T and S inputs are enabled in the model.
+args.value_embedding = 'use_order' if (args.inputs & 3) > 0 else 'no'
+args.use_ve = 1 if (args.inputs & 3) > 0 else 0
+
+print("Inputs: ", args.inputs, "; use_unstructure: ", args.use_unstructure, "; value_embedding: ", args.value_embedding, " use_ve: ", args.use_ve)
+
 args.files_dir = os.path.join(args.data_dir, 'files')
 
 args.n_ehr = len(json.load(open(os.path.join(args.files_dir, 'demo_index_dict.json'), 'r'))) + 10
@@ -85,15 +65,15 @@ def get_lr(epoch):
     lr = args.lr
     return lr
 
-    if epoch <= args.epochs * 0.5:
-        lr = args.lr
-    elif epoch <= args.epochs * 0.75:
-        lr = 0.1 * args.lr
-    elif epoch <= args.epochs * 0.9:
-        lr = 0.01 * args.lr
-    else:
-        lr = 0.001 * args.lr
-    return lr
+    # if epoch <= args.epochs * 0.5:
+    #     lr = args.lr
+    # elif epoch <= args.epochs * 0.75:
+    #     lr = 0.1 * args.lr
+    # elif epoch <= args.epochs * 0.9:
+    #     lr = 0.01 * args.lr
+    # else:
+    #     lr = 0.001 * args.lr
+    # return lr
 
 def index_value(data):
     '''
@@ -110,7 +90,7 @@ def index_value(data):
     return [index, value]
 
 def train_eval(data_loader, net, loss, epoch, optimizer, best_metric, phase='train'):
-    print(phase," ", args.task, " ",args.inputs, " ", args.model)
+    print(phase)
     lr = get_lr(epoch)
     if phase == 'train':
         net.train()
