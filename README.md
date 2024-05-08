@@ -6,6 +6,10 @@ This is a forked repository of paper *Combining structured and unstructured data
 
 Please refer to the dedicated notebook https://github.com/dkrprasetya/clinical-fusion/blob/dev/DL4H_Team_105_project.ipynb for the course assignment submission.
 
+Link to video presentation:
+
+https://mediaspace.illinois.edu/media/t/1_qmt0onnt
+
 
 ### Original Summary
 
