@@ -4,7 +4,7 @@
 
 This is a forked repository of paper *Combining structured and unstructured data for predictive models: a deep learning approach* for UIUC CS598 Deep Learning for Healthcare project purposes.
 
-Please refer to the dedicated notebook https://github.com/dkrprasetya/clinical-fusion/blob/dev/DL4H_Team_105_project_draft.ipynb for the course assignment submission.
+Please refer to the dedicated notebook https://github.com/dkrprasetya/clinical-fusion/blob/dev/DL4H_Team_105_project.ipynb for the course assignment submission.
 
 
 ### Original Summary
