@@ -206,7 +206,8 @@ class CNN(nn.Module):
 
     def forward(self, x, t, dd, content=None):
 
-        if content is not None:
+        if self.args.use_ve == 0:
+            assert content is not None
             # content = self.vocab_embedding(content).transpose(1,2)
             content = self.vocab_layer(content.transpose(1,2))
             content = self.pooling(content)                                       # (64*30, 200, 1)
@@ -247,7 +248,7 @@ class CNN(nn.Module):
         # else:
         #     out = self.output(output)
 
-        if content is not None:
+        if self.args.use_unstructure and content is not None:
             # content = self.vocab_embedding(content)
             content = self.vocab_layer(content.transpose(1,2))
             content = self.pooling(content)                                       # (64*30, 200, 1)

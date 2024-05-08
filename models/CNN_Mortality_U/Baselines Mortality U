@@ -1,0 +1,14 @@
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+(CS598FinalProject) Luiss-iMac:clinical-fusion luis$ python baselines.py --task mortality --model all --inputs 4
+Running task mortality using inputs 4...
+Loading notes...
+Done.
+Start training Logistic Regression:
+Running time: 1.2946078777313232
+(0.3354970960027332, 0.8129433452144578, 0.31968562190307886)
+Start training Random Forest:
+Running time: 900.3002970218658
+(0.2809853733641262, 0.7275087200222558, 0.2198245669330697)
+(CS598FinalProject) Luiss-iMac:clinical-fusion luis$ 

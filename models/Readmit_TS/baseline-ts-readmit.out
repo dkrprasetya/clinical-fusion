@@ -1,0 +1,10 @@
+Running task readmit using inputs 3...
+Loading temporal data...
+Loading demographics...
+Done.
+Start training Logistic Regression:
+Running time: 2.5021448135375977
+(0.13890457368718237, 0.6351884260200658, 0.09273168814049437)
+Start training Random Forest:
+Running time: 514.8490855693817
+(0.13646633529145955, 0.6049297524283729, 0.08385843990378952)

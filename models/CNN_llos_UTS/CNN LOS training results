@@ -1,0 +1,21 @@
+Use the last 24 collections data
+Use the last 24 collections data
+Use the last 24 collections data
+valid
+100%|██████████| 35/35 [01:54<00:00,  3.28s/it]
+1 (0.6858789625360231, 0.745384074941452, 0.7267141896317857)
+Avg [0.6858789625360231, 0.745384074941452, 0.7267141896317857]
+
+valid Epoch 26 (lr 0.000100)
+loss: 0.5950 	
+				 best epoch: 26     best AUC: 0.7454 	
+test
+100%|██████████| 70/70 [01:59<00:00,  1.71s/it]
+1 (0.6725714285714286, 0.7297623682987799, 0.7093904481286148)
+Avg [0.6725714285714286, 0.7297623682987799, 0.7093904481286148]
+
+test Epoch 0 (lr 0.000100)
+loss: 0.6097 	
+				 best epoch: 26     best AUC: 0.7454 	
+
+Process finished with exit code 0

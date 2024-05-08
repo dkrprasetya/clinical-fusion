@@ -135,9 +135,15 @@ def get_ids(split_json):
     train_ids = np.hstack([adm_ids[t] for t in splits[:7]])
     val_ids = np.hstack([adm_ids[t] for t in splits[7:8]])
     test_ids = np.hstack([adm_ids[t] for t in splits[8:]])
-    train_ids = [adm_id[-10:-4] for adm_id in train_ids]
-    val_ids = [adm_id[-10:-4] for adm_id in val_ids]
-    test_ids = [adm_id[-10:-4] for adm_id in test_ids]
+
+    # train_ids = [adm_id[-10:-4] for adm_id in train_ids]
+    # val_ids = [adm_id[-10:-4] for adm_id in val_ids]
+    # test_ids = [adm_id[-10:-4] for adm_id in test_ids]
+
+    train_ids = list(map(lambda x: int(float(x[-12:-4])), train_ids))
+    val_ids = list(map(lambda x: int(float(x[-12:-4])), val_ids))
+    test_ids = list(map(lambda x: int(float(x[-12:-4])), test_ids))
+    
     return train_ids, val_ids, test_ids
 
 
@@ -148,9 +154,15 @@ def get_ids2(split_json, seed):
     train_ids = np.hstack([adm_ids[t] for t in splits[:7]])
     val_ids = np.hstack([adm_ids[t] for t in splits[7:8]])
     test_ids = np.hstack([adm_ids[t] for t in splits[8:]])
-    train_ids = [adm_id[-10:-4] for adm_id in train_ids]
-    val_ids = [adm_id[-10:-4] for adm_id in val_ids]
-    test_ids = [adm_id[-10:-4] for adm_id in test_ids]
+
+    # train_ids = [adm_id[-10:-4] for adm_id in train_ids]
+    # val_ids = [adm_id[-10:-4] for adm_id in val_ids]
+    # test_ids = [adm_id[-10:-4] for adm_id in test_ids]
+
+    train_ids = list(map(lambda x: int(float(x[-12:-4])), train_ids))
+    val_ids = list(map(lambda x: int(float(x[-12:-4])), val_ids))
+    test_ids = list(map(lambda x: int(float(x[-12:-4])), test_ids))
+
     return train_ids, val_ids, test_ids
 
 

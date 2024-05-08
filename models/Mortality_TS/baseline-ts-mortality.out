@@ -1,0 +1,10 @@
+Running task mortality using inputs 3...
+Loading temporal data...
+Loading demographics...
+Done.
+Start training Logistic Regression:
+Running time: 2.606104612350464
+(0.30498533724340177, 0.7589864600749098, 0.28127961911058247)
+Start training Random Forest:
+Running time: 474.9372980594635
+(0.3369639210347175, 0.7776660375291596, 0.32220562745365505)

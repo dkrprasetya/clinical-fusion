@@ -1,0 +1,18 @@
+Inputs:  3 ; use_unstructure:  0 ; value_embedding:  use_order  use_ve:  1
+Use the last 24 collections data
+Use the last 24 collections data
+Use the last 24 collections data
+valid
+1 (0.7156010230179028, 0.7743299504657362, 0.778035946227497)
+Avg [0.7156010230179028, 0.7743299504657362, 0.778035946227497]
+
+valid Epoch 26 (lr 0.000100)
+loss: 0.5706 	
+				 best epoch: 26     best AUC: 0.7743 	
+test
+1 (0.6991381561765474, 0.7534332891857651, 0.7495584250524012)
+Avg [0.6991381561765474, 0.7534332891857651, 0.7495584250524012]
+
+test Epoch 0 (lr 0.000100)
+loss: 0.5882 	
+				 best epoch: 26     best AUC: 0.7743 	

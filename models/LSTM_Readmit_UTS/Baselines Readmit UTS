@@ -1,0 +1,13 @@
+(CS598FinalProject) Luiss-iMac:clinical-fusion luis$ python baselines.py --task readmit --inputs 7 --model all
+Running task readmit using inputs 7...
+Loading notes...
+Loading temporal data...
+Loading demographics...
+Done.
+Start training Logistic Regression:
+Running time: 3.5070269107818604
+(0.167574931880109, 0.6554811233885819, 0.10436731303653383)
+Start training Random Forest:
+Running time: 1415.1356461048126
+(0.1292798110979929, 0.5813850521792512, 0.08293397844100342)
+(CS598FinalProject) Luiss-iMac:clinical-fusion luis$ 

@@ -1,0 +1,13 @@
+(CS598FinalProject) Luiss-iMac:clinical-fusion luis$ python baselines.py --task mortality --inputs 7 --model all
+Running task mortality using inputs 7...
+Loading notes...
+Loading temporal data...
+Loading demographics...
+Done.
+Start training Logistic Regression:
+Running time: 3.468372106552124
+(0.3554153522607782, 0.8337368195344568, 0.35600274523145964)
+Start training Random Forest:
+Running time: 1081.789682149887
+(0.34019319613607724, 0.7974421435436685, 0.3051164371748214)
+(CS598FinalProject) Luiss-iMac:clinical-fusion luis$ 

@@ -18,12 +18,13 @@ from utils import cal_metric, get_ids, text2words
 
 warnings.filterwarnings('ignore')
 
+#python baselines.py --model lr --task mortality --inputs 3
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--task', type=str, default='mortality') # mortality, readmit, or llos
     parser.add_argument('--model', type=str, default='all') # all, lr, or rf
-    parser.add_argument('--inputs', type=int, default=4) # 3: T + S, 4: U, 7: U + T + S
+    parser.add_argument('--inputs', type=int, default=7) # 3: T + S, 4: U, 7: U + T + S
     args = parser.parse_args()
     return args
 
@@ -34,7 +35,7 @@ def train_test_base(X_train, X_test, y_train, y_test, name):
         print('Start training Logistic Regression:')
         model = LogisticRegression()
         param_grid = {
-            'penalty': ['l1', 'l2']
+            'penalty': ['l2']
         }
     else:
         print('Start training Random Forest:')
@@ -64,7 +65,7 @@ def train_test_base(X_train, X_test, y_train, y_test, name):
     else:
         metric = cal_metric(y_test, probs[:, 1])
         print(metric)
-    
+
 
 if __name__ == '__main__':
     args = parse_args()
@@ -85,8 +86,8 @@ if __name__ == '__main__':
     if choices[0] == '1':
         print('Loading notes...')
         vector_dict = json.load(open('data/processed/files/vector_dict.json'))
-        X_train_notes = [np.mean(vector_dict.get(adm_id, []), axis=0) for adm_id in train_ids]
-        X_test_notes = [np.mean(vector_dict.get(adm_id, []), axis=0) for adm_id in test_ids]
+        X_train_notes = [np.mean(vector_dict.get(str(adm_id), []), axis=0) for adm_id in train_ids]
+        X_test_notes = [np.mean(vector_dict.get(str(adm_id), []), axis=0) for adm_id in test_ids]
         X_train.append(X_train_notes)
         X_test.append(X_test_notes)
     if choices[1] == '1':
@@ -95,7 +96,8 @@ if __name__ == '__main__':
         temporal_mm_dict = json.load(open('data/processed/files/feature_mm_dict.json'))
         for col in df_temporal.columns[1:]:
             col_min, col_max = temporal_mm_dict[col]
-            df_temporal[col] = (df_temporal[col] - col_min) / (col_max - col_min)
+            # Updated: convert to float
+            df_temporal[col] = (df_temporal[col].astype(float) - float(col_min)) / (float(col_max) - float(col_min))
         df_temporal = df_temporal.groupby(
             'hadm_id').agg(['mean', 'count', 'max', 'min', 'std'])
         df_temporal.columns = ['_'.join(col).strip()
@@ -111,17 +113,35 @@ if __name__ == '__main__':
         print('Loading demographics...')
         demo_json = json.load(open('data/processed/files/demo_dict.json'))
         df_demo = pd.DataFrame(demo_json.items(), columns=['hadm_id', 'demos']).sort_values('hadm_id')
-        X_train_demo = df_demo[df_demo['hadm_id'].isin(train_ids)][['demos']].to_numpy()
-        X_test_demo = df_demo[df_demo['hadm_id'].isin(test_ids)][['demos']].to_numpy()
-        X_train.append(X_train_demo)
-        X_test.append(X_test_demo)
-    
+
+        str_train_ids = [str(id) for id in train_ids]
+        str_test_ids = [str(id) for id in test_ids]
+
+        X_train_demo = df_demo[df_demo['hadm_id'].isin(str_train_ids)][['demos']].to_numpy()
+        X_test_demo = df_demo[df_demo['hadm_id'].isin(str_test_ids)][['demos']].to_numpy()
+
+        # ValueError: setting an array element with a sequence fix when selecting demographics
+
+        X_train_demo_bis, X_test_demo_bis = [], []
+
+        for item in X_train_demo:
+            X_train_demo_bis.append(np.array(item[0]))
+
+        for item in X_test_demo:
+            X_test_demo_bis.append(np.array(item[0]))
+
+        X_train.append(X_train_demo_bis)
+        X_test.append(X_test_demo_bis)
+
     print('Done.')
     df_cols = df.columns[1:]
+
     X_train = np.concatenate(X_train, axis=1)
     X_test = np.concatenate(X_test, axis=1)
     y_train = df[df['hadm_id'].isin(train_ids)][df_cols].to_numpy()
     y_test = df[df['hadm_id'].isin(test_ids)][df_cols].to_numpy()
+
+    #print(X_train)
 
     if model == 'all':
         train_test_base(X_train, X_test, y_train, y_test, 'lr')

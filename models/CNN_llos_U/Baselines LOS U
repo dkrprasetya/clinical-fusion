@@ -1,0 +1,11 @@
+(CS598FinalProject) Luiss-iMac:clinical-fusion luis$ python baselines.py --task llos --model all --inputs 4
+Running task llos using inputs 4...
+Loading notes...
+Done.
+Start training Logistic Regression:
+Running time: 1.254702091217041
+(0.6673442718164658, 0.7258571597260621, 0.7022157298985366)
+Start training Random Forest:
+Running time: 848.3335390090942
+(0.6628895184135977, 0.7003708390576553, 0.6771136170542492)
+(CS598FinalProject) Luiss-iMac:clinical-fusion luis$ 

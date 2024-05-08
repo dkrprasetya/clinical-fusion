@@ -1,6 +1,7 @@
 from matplotlib.pyplot import plot
 import pandas as pd
 import numpy as np
+import os 
 
 import matplotlib.pyplot as plt
 
@@ -72,16 +73,25 @@ def plot_temporal():
     fig, axs = plt.subplots(nrows, ncols)
     cols = df.columns[2:]
     for i in range(nrows):
+        print("i:", i)
         for j in range(ncols):
             if i * ncols + j < len(cols):
-                print(j)
+                print("j:", j)
                 col = cols[i * ncols + j]
-                axs[i, j].hist(df[col], bins=20)
+                #print("df[col]", df[col])
+                # Update: convert NAN to 0
+                data = pd.to_numeric(df[col], errors='coerce').fillna(0)
+                axs[i, j].hist(data, bins=20)
                 axs[i, j].title.set_text(col)
+                # axs[i, j].hist(df[col], bins=20)
+                # axs[i, j].title.set_text(col)
     plt.savefig('imgs/temporal.png')
 
 
 if __name__ == '__main__':
+    if not os.path.exists("imgs"):
+        os.makedirs("imgs") 
+
     # cal_demo()
     # cal_temporal()
     # cal_task_temporal()

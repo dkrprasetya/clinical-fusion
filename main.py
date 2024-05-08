@@ -1,10 +1,7 @@
-import sys
-
 import os
 import sys
 import time
 import numpy as np
-from sklearn import metrics
 import random
 import json
 from glob import glob
@@ -21,13 +18,17 @@ from torch.utils.data import DataLoader
 import data_loader
 import lstm, cnn
 import myloss
-import function
+from function import *
+
+import sklearn
+
 from utils import cal_metric
 
-sys.path.append('./tools')
-import parse, py_op
+from py_op import *
+from parse import *
 
-args = parse.args
+args = parse_args()
+
 args.embed_size = 200
 args.hidden_size = args.rnn_size = args.embed_size 
 if torch.cuda.is_available():
@@ -35,23 +36,28 @@ if torch.cuda.is_available():
 else:
     args.gpu = 0
 
-args.use_ve = 1
 args.n_visit = 24
-args.use_unstructure = 1
-args.value_embedding = 'use_order'
-# args.value_embedding = 'no'
-print ('epochs,', args.epochs)
 
-args.task = 'mortality'
-args.files_dir = args.files_dir
-args.data_dir = args.data_dir
+args.use_unstructure = 1 if (args.inputs & 4) > 0 else 0
 
+# Note that T and S inputs are in one set due to limitations on the original implementation.
+# If any of T or S is enabled, then both T and S inputs are enabled in the model.
+args.value_embedding = 'use_order' if (args.inputs & 3) > 0 else 'no'
+args.use_ve = 1 if (args.inputs & 3) > 0 else 0
+
+print("Inputs: ", args.inputs, "; use_unstructure: ", args.use_unstructure, "; value_embedding: ", args.value_embedding, " use_ve: ", args.use_ve)
+
+args.files_dir = os.path.join(args.data_dir, 'files')
+
+args.n_ehr = len(json.load(open(os.path.join(args.files_dir, 'demo_index_dict.json'), 'r'))) + 10
+args.name_list = json.load(open(os.path.join(args.files_dir, 'feature_list.json'), 'r'))[1:]
+args.input_size = len(args.name_list)
+args.vocab_size = args.input_size + 2
+
+# Update: param async is removed
 def _cuda(tensor, is_tensor=True):
     if args.gpu:
-        if is_tensor:
-            return tensor.cuda(async=True)
-        else:
-            return tensor.cuda()
+        return tensor.cuda()
     else:
         return tensor
 
@@ -59,15 +65,15 @@ def get_lr(epoch):
     lr = args.lr
     return lr
 
-    if epoch <= args.epochs * 0.5:
-        lr = args.lr
-    elif epoch <= args.epochs * 0.75:
-        lr = 0.1 * args.lr
-    elif epoch <= args.epochs * 0.9:
-        lr = 0.01 * args.lr
-    else:
-        lr = 0.001 * args.lr
-    return lr
+    # if epoch <= args.epochs * 0.5:
+    #     lr = args.lr
+    # elif epoch <= args.epochs * 0.75:
+    #     lr = 0.1 * args.lr
+    # elif epoch <= args.epochs * 0.9:
+    #     lr = 0.01 * args.lr
+    # else:
+    #     lr = 0.001 * args.lr
+    # return lr
 
 def index_value(data):
     '''
@@ -124,13 +130,13 @@ def train_eval(data_loader, net, loss, epoch, optimizer, best_metric, phase='tra
     pred = np.concatenate(pred_list, 0)
     label = np.concatenate(label_list, 0)
     if len(pred.shape) == 1:
-        metric = function.compute_auc(label, pred)
+        metric = sklearn.metrics.roc_auc_score(label, pred)
     else:
         metrics = []
         auc_metrics = []
         for i_shape in range(pred.shape[1]):
             metric0 = cal_metric(label[:, i_shape], pred[:, i_shape])
-            auc_metric = function.compute_auc(label[:, i_shape], pred[:, i_shape])
+            auc_metric = sklearn.metrics.roc_auc_score(label[:, i_shape], pred[:, i_shape])
             # print('........AUC_{:d}: {:3.4f}, AUPR_{:d}: {:3.4f}'.format(i_shape, auc, i_shape, aupr))
             print(i_shape + 1, metric0)
             metrics.append(metric0)
@@ -143,16 +149,19 @@ def train_eval(data_loader, net, loss, epoch, optimizer, best_metric, phase='tra
     print('loss: {:3.4f} \t'.format(avg_loss))
     if phase == 'valid' and best_metric[0] < metric:
         best_metric = [metric, epoch]
-        function.save_model({'args': args, 'model': net, 'epoch':epoch, 'best_metric': best_metric})
+
+        # function.save_model({'args': args, 'model': net, 'epoch':epoch, 'best_metric': best_metric})
+        if not os.path.exists("models"):
+            os.makedirs("models") 
+
+        torch.save(net.state_dict(), './models/{}.model'.format(args.model))
     if phase != 'train':
         print('\t\t\t\t best epoch: {:d}     best AUC: {:3.4f} \t'.format(best_metric[1], best_metric[0])) 
     return best_metric
 
 
 def main():
-    args.n_ehr = len(json.load(open(os.path.join(args.files_dir, 'demo_index_dict.json'), 'r'))) + 10
-    args.name_list = json.load(open(os.path.join(args.files_dir, 'feature_list.json'), 'r'))[1:]
-    args.input_size = len(args.name_list)
+    
     files = sorted(glob(os.path.join(args.data_dir, 'resample_data/*.csv')))
     data_splits = json.load(open(os.path.join(args.files_dir, 'splits.json'), 'r'))
     train_files = [f for idx in [0, 1, 2, 3, 4, 5, 6] for f in data_splits[idx]]
@@ -169,11 +178,12 @@ def main():
     valid_loader = DataLoader(valid_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.workers, pin_memory=True)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.workers, pin_memory=True)
 
-    args.vocab_size = args.input_size + 2
-
     # net = icnn.CNN(args)
-    # net = cnn.CNN(args)
-    net = lstm.LSTM(args)
+
+    if args.model == 'cnn':
+        net = cnn.CNN(args)
+    else:
+        net = lstm.LSTM(args)
     # net = torch.nn.DataParallel(net)
     # loss = myloss.Loss(0)
     loss = myloss.MultiClassLoss(0)
@@ -186,15 +196,18 @@ def main():
 
     if args.resume:
         p_dict = {'model': net}
-        function.load_model(p_dict, args.resume)
-        best_metric = p_dict['best_metric']
-        start_epoch = p_dict['epoch'] + 1
+        # function.load_model(p_dict, args.resume)
+        net.load_state_dict(torch.load('./models/{}.model'.format(args.model)))
 
     parameters_all = []
     for p in net.parameters():
         parameters_all.append(p)
 
     optimizer = torch.optim.Adam(parameters_all, args.lr)
+
+    if args.resume:
+        best_metric = train_eval(valid_loader, net, loss, args.epochs + 1, optimizer, best_metric, phase='valid')
+        start_epoch = args.epochs + 1
 
     if args.phase == 'train':
         for epoch in range(start_epoch, args.epochs):
@@ -210,5 +223,4 @@ def main():
         train_eval(test_loader, net, loss, 0, optimizer, best_metric, 'test')
 
 if __name__ == '__main__':
-    print(args)
     main()
